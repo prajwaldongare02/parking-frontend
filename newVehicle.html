@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add New Vehicle</title>
+
+<style>
+body{
+    background:#0f172a;
+    font-family:Arial;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    margin:0;
+    color:white;
+}
+
+.card{
+    background:#1e293b;
+    padding:40px;
+    border-radius:20px;
+    width:350px;
+    box-shadow:0 0 20px rgba(0,0,0,0.5);
+}
+
+h2{
+    text-align:center;
+    margin-bottom:25px;
+}
+
+input,select{
+    width:100%;
+    padding:12px;
+    margin-top:10px;
+    margin-bottom:20px;
+    border:none;
+    border-radius:10px;
+    background:#0f172a;
+    color:white;
+}
+
+button{
+    width:100%;
+    padding:14px;
+    border:none;
+    border-radius:10px;
+    background:#22c55e;
+    color:white;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#16a34a;
+}
+
+#result{
+    margin-top:20px;
+    text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<h2>➕ Add New Vehicle</h2>
+
+<input type="number" id="userId" placeholder="Enter User ID">
+
+<input type="text" id="vehicleNumber" placeholder="Vehicle Number">
+
+<select id="vehicleType">
+    <option value="CAR">CAR</option>
+    <option value="BIKE">BIKE</option>
+</select>
+
+<input type="password" id="password" placeholder="Enter Password">
+
+<button onclick="saveVehicle()">SAVE VEHICLE</button>
+
+<div id="result"></div>
+
+</div>
+
+<script>
+
+let BASE_URL = "https://parking-backend-production-e6a9.up.railway.app";
+
+function saveVehicle(){
+
+    let userId = document.getElementById("userId").value;
+    let vehicleNumber = document.getElementById("vehicleNumber").value;
+    let vehicleType = document.getElementById("vehicleType").value;
+    let password = document.getElementById("password").value;
+    let result = document.getElementById("result");
+
+    fetch(`${BASE_URL}/vehicle/add-today-vehicle?userId=${userId}&vehicleNumber=${vehicleNumber}&vehicleType=${vehicleType}&password=${password}`,{
+        method:"POST"
+    })
+    .then(res=>{
+        if(!res.ok){
+            return res.text().then(text=>{throw new Error(text)});
+        }
+        return res.json();
+    })
+    .then(data=>{
+
+        result.style.color="#22c55e";
+        result.innerText="✅ Vehicle Added Successfully";
+
+        setTimeout(()=>{
+            window.location.href="index.html";
+        },1500);
+    })
+    .catch(err=>{
+        result.style.color="#ef4444";
+        result.innerText="❌ "+err.message;
+    });
+}
+
+</script>
+
+</body>
+</html>

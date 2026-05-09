@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parking Entry Terminal</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+
+     body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: #0f172a;
+    color: white;
+
+    min-height: 100vh;
+    overflow-y: auto;
+
+    display: flex;                /* ⭐ ADD THIS */
+    justify-content: center;      /* ⭐ CENTER HORIZONTALLY */
+    align-items: center;          /* ⭐ CENTER VERTICALLY */
+}
+        /* TERMINAL BOX */
+        .terminal-card {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 450px;
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid #334155;
+            text-align: center;
+            position: relative;
+        }
+
+        .terminal-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: var(--primary);
+            border-bottom-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+        }
+
+        h2 {
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .input-group {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+            margin-left: 4px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: all 0.2s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-fetch {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+
+        .btn-fetch:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .btn-park {
+            background: var(--success);
+            color: white;
+            box-shadow: 0 4px 14px 0 rgba(34, 197, 94, 0.3);
+        }
+
+        .btn-park:hover {
+            background: #16a34a;
+            transform: translateY(-2px);
+        }
+
+        #result {
+            margin-top: 25px;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            min-height: 20px;
+            transition: all 0.3s;
+        }
+
+        /* Success/Error States for Result */
+        .status-msg {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px dashed #334155;
+        }
+
+        .car-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="terminal-card">
+    <span class="car-icon">🏎️</span>
+    <h2>ENTRY TERMINAL</h2>
+
+    <div class="input-group">
+        <label>User Identification</label>
+        <input type="number" id="userId" placeholder="Enter your User ID">
+    </div>
+
+    <button class="btn-fetch" onclick="getVehicles()">🔍 Locate Vehicles</button>
+    
+
+    <div class="input-group">
+        <label>Select Registered Vehicle</label>
+        <select id="vehicleDropdown">
+            <option>Select Vehicle</option>
+        </select>
+    </div>
+    <button class="btn-outline" onclick="window.location.href='newVehicle.html'">
+    ➕ Today New Vehicle
+</button>
+    
+    <button class="btn-park" onclick="createBooking()">🚀 PARK VEHICLE</button>
+    <button onclick="exitVehicle()">Exit Vehicle</button>
+
+    <div id="result" class="status-msg">Waiting for User ID...</div>
+</div>
+
+<script>
+let BASE_URL = "https://parking-backend-production-e6a9.up.railway.app";
+
+function getVehicles() {
+    let userId = document.getElementById("userId").value;
+    let resDiv = document.getElementById("result");
+
+    if (!userId) {
+        resDiv.innerText = "⚠️ Please enter a User ID first";
+        resDiv.style.color = "#fbbf24";
+        return;
+    }
+
+    fetch(`${BASE_URL}/vehicle/user/${userId}`)
+    .then(res => res.json())
+    .then(data => {
+        let dropdown = document.getElementById("vehicleDropdown");
+        dropdown.innerHTML = "";
+
+        if (data.length === 0) {
+            resDiv.innerText = "❌ No vehicles found for this user";
+            resDiv.style.color = "#ef4444";
+            return;
+        }
+
+        data.forEach(v => {
+            let option = document.createElement("option");
+            option.value = v.vehicleNumber;
+            option.text = `${v.vehicleNumber} (${v.vehicleType})`;
+            option.setAttribute("data-type", v.vehicleType);
+            dropdown.appendChild(option);
+        });
+
+        resDiv.innerText = "✅ Vehicles loaded. Select one to park.";
+        resDiv.style.color = "#22c55e";
+    })
+    .catch(() => {
+        resDiv.innerText = "❌ Connection Error";
+        resDiv.style.color = "#ef4444";
+    });
+}
+function todayNewVehicle() {
+
+    let userId = document.getElementById("userId").value;
+    let resDiv = document.getElementById("result");
+
+    if (!userId) {
+        resDiv.innerText = "❌ Enter User ID first";
+        resDiv.style.color = "#ef4444";
+        return;
+    }
+
+    let vehicleNumber = prompt("Enter Vehicle Number:");
+    if (!vehicleNumber) return;
+
+    let vehicleType = prompt("Enter Vehicle Type (CAR/BIKE):");
+    if (!vehicleType) return;
+
+    let password = prompt("Enter Your Password:");
+    if (!password) return;
+
+    fetch(`${BASE_URL}/vehicle/add-today-vehicle?userId=${userId}&vehicleNumber=${vehicleNumber}&vehicleType=${vehicleType}&password=${password}`, {
+        method: "POST"
+    })
+    .then(res => {
+        if (!res.ok) {
+            return res.text().then(text => { throw new Error(text); });
+        }
+        return res.json();
+    })
+    .then(data => {
+
+        resDiv.style.color = "#22c55e";
+        resDiv.innerText = "✅ New vehicle added successfully";
+
+        // OPTIONAL AUTO REFRESH VEHICLE LIST
+        getVehicles();
+    })
+    .catch(err => {
+        resDiv.style.color = "#ef4444";
+        resDiv.innerText = "❌ " + err.message;
+    });
+}
+
+function createBooking() {
+    let userId = document.getElementById("userId").value;
+    let dropdown = document.getElementById("vehicleDropdown");
+    let resDiv = document.getElementById("result");
+
+    if (!userId) {
+        resDiv.innerText = "⚠️ Please enter User ID first";
+        resDiv.style.color = "#fbbf24";
+        return;
+    }
+
+    if (dropdown.selectedIndex === -1 || dropdown.options.length === 0) {
+        resDiv.innerText = "⚠️ Please select a vehicle";
+        resDiv.style.color = "#fbbf24";
+        return;
+    }
+
+    let selected = dropdown.options[dropdown.selectedIndex];
+    let vehicleNumber = selected.value;
+    let vehicleType = selected.getAttribute("data-type");
+
+    resDiv.innerText = "⏳ Initializing Parking Sequence...";
+    resDiv.style.color = "#3b82f6";
+
+    fetch(`${BASE_URL}/booking/create?userId=${userId}&vehicleNumber=${vehicleNumber}&vehicleType=${vehicleType}`, {
+    method: "POST"
+})
+.then(res => res.text())
+.then(text => {
+    let data;
+
+    try {
+        data = JSON.parse(text);
+    } catch {
+        throw new Error(text);
+    }
+
+    // 🔥 HANDLE ERROR FIRST
+    if (!data.slot) {
+    throw new Error(text);
+}
+
+    // ✅ SUCCESS
+    resDiv.style.color = "#22c55e";
+    resDiv.innerText = "✅ Gate Opening... Slot: " + data.slot.slotNumber;
+})
+.catch(err => {
+
+    if(err.message.includes("Parking Full")){
+        alert("🚫 Parking Full");
+    }
+
+    resDiv.style.color = "#ef4444";
+    resDiv.innerText = "❌ " + err.message;
+});
+}
+function exitVehicle() {
+    let userId = document.getElementById("userId").value;
+    let resDiv = document.getElementById("result");
+
+    if (!userId) {
+        resDiv.innerText = "❌ Enter User ID first";
+        resDiv.style.color = "#ef4444";
+        return;
+    }
+
+    resDiv.innerText = "⏳ Processing exit...";
+    resDiv.style.color = "#3b82f6";
+
+    fetch(`${BASE_URL}/booking/active/${userId}`)
+    .then(res => res.json())
+    .then(data => {
+        console.log("ACTIVE BOOKING:", data);
+
+        let bookingId = data.bookingId;
+
+        if (!bookingId) {
+            throw new Error("No active booking found");
+        }
+
+        return fetch(`${BASE_URL}/booking/exit/${bookingId}`, {
+            method: "PUT"
+        });
+    })
+    .then(res => res.json())
+    .then(data => {
+        resDiv.style.background = "rgba(34, 197, 94, 0.1)";
+        resDiv.style.border = "1px solid #22c55e";
+        resDiv.style.color = "#22c55e";
+        resDiv.innerHTML = `✅ Exit Successful! Amount: ₹${data.totalAmount}`;
+
+        // optional refresh after exit
+        
+    })
+    .catch(err => {
+        resDiv.style.background = "rgba(239, 68, 68, 0.1)";
+        resDiv.style.border = "1px solid #ef4444";
+        resDiv.style.color = "#ef4444";
+        resDiv.innerText = "❌ " + err.message;
+        console.log(err);
+    });
+    
+}
+
+
+</script>
+
+</body>
+</html>

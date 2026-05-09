@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Vehicle | Smart Parking</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --primary: #3b82f6;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .form-card {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 400px;
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid #334155;
+            text-align: center;
+        }
+
+        .icon-header {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        h2 {
+            font-weight: 700;
+            margin-bottom: 30px;
+            letter-spacing: -0.5px;
+        }
+
+        .input-wrapper {
+            text-align: left;
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-bottom: 6px;
+            margin-left: 4px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: all 0.2s;
+            appearance: none; /* Removes default arrow for custom look */
+        }
+
+        /* Custom dropdown arrow for select */
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 16px;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 16px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 12px;
+            background: var(--primary);
+            color: white;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 14px 0 rgba(59, 130, 246, 0.3);
+        }
+
+        button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+        }
+
+        #msg {
+            margin-top: 25px;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            min-height: 20px;
+        }
+
+        .success-msg {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+
+        .error-msg {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+    </style>
+</head>
+<body>
+
+<div class="form-card">
+    <span class="icon-header">🚘</span>
+    <h2>Add Vehicle</h2>
+
+    <div class="input-wrapper">
+        <label>Owner User ID</label>
+        <input id="userId" type="number" placeholder="Enter User ID">
+    </div>
+
+    <div class="input-wrapper">
+        <label>Vehicle License Plate</label>
+        <input id="vehicleNumber" type="text" placeholder="e.g. ABC-1234">
+    </div>
+
+    <div class="input-wrapper">
+        <label>Classification</label>
+        <select id="vehicleType">
+            <option value="CAR">CAR</option>
+            <option value="BIKE">BIKE</option>
+        </select>
+    </div>
+
+    <button onclick="addVehicle()">Register Vehicle</button>
+
+    <div id="msg"></div>
+</div>
+
+<script>
+let BASE_URL = "https://parking-backend-production-e6a9.up.railway.app";
+
+function addVehicle() {
+    const msgDiv = document.getElementById("msg");
+    const userId = document.getElementById("userId").value;
+    const vehicleNumber = document.getElementById("vehicleNumber").value;
+    const vehicleType = document.getElementById("vehicleType").value;
+
+    if(!userId || !vehicleNumber) {
+        msgDiv.innerText = "⚠️ Please provide ID and Plate Number";
+        msgDiv.className = "error-msg";
+        return;
+    }
+
+    msgDiv.innerText = "⏳ Registering...";
+    msgDiv.className = "";
+
+    fetch(`${BASE_URL}/vehicle/add?userId=${userId}&vehicleNumber=${vehicleNumber}&vehicleType=${vehicleType}`, {
+        method: "POST"
+    })
+    .then(res => res.json())
+    .then(data => {
+        msgDiv.className = "success-msg";
+        msgDiv.innerHTML = `✅ Vehicle Linked Successfully!<br><small>Reference ID: ${data.id}</small>`;
+        
+        // Clear inputs on success
+        document.getElementById("vehicleNumber").value = "";
+    })
+    .catch(() => {
+        msgDiv.className = "error-msg";
+        msgDiv.innerText = "❌ Error adding vehicle. Check User ID.";
+    });
+}
+</script>
+
+</body>
+</html>

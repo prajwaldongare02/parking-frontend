@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Parking Admin | Pro</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --card-bg: #1e293b;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR NAVIGATION */
+        nav {
+            width: 280px;
+            background: #020617;
+            padding: 24px;
+            border-right: 1px solid #1e293b;
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary);
+        }
+
+        /* MAIN CONTENT AREA */
+        main {
+            flex: 1;
+            padding: 30px;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        #time {
+            font-family: monospace;
+            background: #1e293b;
+            padding: 8px 15px;
+            border-radius: 8px;
+            color: #60a5fa;
+            border: 1px solid #334155;
+        }
+
+        /* CARDS & FORMS */
+        .section-title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+            margin: 20px 0 10px 0;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #334155;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 10px;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            color: white;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            margin: 5px 0;
+            border: none;
+            border-radius: 8px;
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        /* PARKING GRID */
+        .zone-block {
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .slot-result-box {
+    margin-top: 12px;
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    border-radius: 12px;
+    padding: 10px;
+    color: white;
+}
+
+
+.slot-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: white;
+    font-size: 14px;
+}
+
+.slot-table th {
+    text-align: left;
+    padding: 10px;
+    background: rgba(37, 99, 235, 0.2);
+    color: #93c5fd;
+}
+
+.slot-table td {
+    padding: 10px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+
+.slot-badge.available {
+    color: #22c55e;
+}
+
+.slot-badge.occupied {
+    color: #ef4444;
+}
+
+        .slot {
+            height: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+        }
+
+        .available {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: var(--success);
+            color: var(--success);
+        }
+        .stat-result-box {
+    margin-top: 16px;
+    min-height: 70px;
+    background: linear-gradient(135deg, rgba(15,23,42,0.95), rgba(30,41,59,0.95));
+    border: 1px solid rgba(59,130,246,0.25);
+    border-radius: 14px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+}
+
+.stat-label {
+    font-size: 13px;
+    color: #93c5fd;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+}
+
+.stat-value {
+    font-size: 30px;
+    font-weight: 700;
+    color: #f8fafc;
+}
+
+.stat-sub {
+    margin-top: 6px;
+    font-size: 13px;
+    color: #22c55e;
+}
+
+        .occupied {
+            background: var(--danger);
+            color: white;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+        }
+
+        .slot:hover {
+            transform: translateY(-5px) scale(1.05);
+        }
+
+        #result, #slotResult, #zoneResult {
+            margin-top: 15px;
+            font-size: 0.85rem;
+            padding: 10px;
+            background: #020617;
+            border-radius: 6px;
+            color: #fbbf24;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <div class="logo">ParkMatrix</div>
+    
+    <div class="section-title">Admin Quick Stats</div>
+    <button onclick="getTotalSlots()">Total Slots</button>
+    <button onclick="getAvailableSlots()">Available Slots</button>
+    <button onclick="getOccupiedSlots()">Occupied Slots</button>
+    <button onclick="getRevenue()" style="background: #8b5cf6;">Today Revenue</button>
+
+    <div class="section-title">User & Vehicle</div>
+    <button class="btn-outline" onclick="openAddUser()">➕ Add User</button>
+    <button class="btn-outline" onclick="openAddVehicle()">➕ Add Vehicle</button>
+    <button class="btn-outline" onclick="openUsersPage()">👥 View All Users</button>
+    <button onclick="openActiveBookingsPage()">Active Bookings</button>
+    <div id="activeBookingResult" class="slot-result-box"></div>
+
+    <div id="result" class="stat-result-box"></div>
+</nav>
+
+<main>
+    <header>
+        <h1>Parking Dashboard</h1>
+        <div id="time">00:00:00</div>
+    </header>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <!-- Slot Management -->
+        <div class="card">
+            <h3>Slot Management</h3>
+            <div style="display: flex; gap: 10px;">
+                <input id="slotNumber" placeholder="Slot No.">
+                <input id="zoneId" placeholder="Zone ID">
+            </div>
+            <button onclick="addSlot()">Add New Slot</button>
+            <input id="deleteSlotNumber" placeholder="Slot Number (A1, B1)">
+<button onclick="deleteSlotByNumber()">Delete Slot</button>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+                <button class="btn-outline" onclick="getAllSlots()">View All</button>
+                <button class="btn-outline" onclick="loadSlots()">Refresh Grid</button>
+            </div>
+
+           <div id="slotResult" class="slot-result-box"></div>
+        </div>
+
+        <!-- Zone Management -->
+        <div class="card">
+            <h3>Zone Management</h3>
+            <input id="zoneName" placeholder="Zone Name (e.g. A, B, VIP)">
+            <input id="vehicleType" placeholder="Vehicle Type (CAR / BIKE)">
+            <button onclick="addZone()">Create Zone</button>
+            <button class="btn-outline" onclick="getZones()">View Zones</button>
+           <div id="zoneResult" class="slot-result-box"></div>
+        </div>
+    </div>
+
+    <div class="section-title">Live Parking Status</div>
+    <div id="zonesContainer">
+        <!-- Zones will be loaded here dynamically -->
+    </div>
+</main>
+
+<script>
+let BASE_URL = "https://parking-backend-production-e6a9.up.railway.app";
+
+// 🕒 REAL-TIME CLOCK
+setInterval(() => {
+    document.getElementById("time").innerText = new Date().toLocaleTimeString();
+}, 1000);
+
+// 🔥 LOAD SLOTS (Logic preserved, UI updated)
+function loadSlots() {
+    fetch(`${BASE_URL}/slot/all`)
+    .then(res => res.json())
+    .then(data => {
+        let container = document.getElementById("zonesContainer");
+        container.innerHTML = "";
+
+        let zones = {};
+        data.forEach(slot => {
+            let zoneName = slot.zone.zoneName;
+            if (!zones[zoneName]) zones[zoneName] = [];
+            zones[zoneName].push(slot);
+        });
+
+        for (let zone in zones) {
+            let zoneDiv = document.createElement("div");
+            zoneDiv.classList.add("zone-block");
+
+            let title = document.createElement("h3");
+            title.style.margin = "0 0 15px 0";
+            title.innerHTML = `Zone ${zone} <span style="font-size:0.8rem; color:#94a3b8; font-weight:400;">— ${zones[zone][0].zone.vehicleType}</span>`;
+            zoneDiv.appendChild(title);
+
+            let grid = document.createElement("div");
+            grid.classList.add("grid");
+
+            zones[zone].forEach(slot => {
+                let div = document.createElement("div");
+                div.classList.add("slot");
+                
+                if (slot.status === "AVAILABLE") {
+                    div.classList.add("available");
+                } else {
+                    div.classList.add("occupied");
+                }
+
+                div.innerHTML = `<span>${slot.slotNumber}</span>`;
+
+                div.onclick = function () {
+                    alert(`Slot: ${slot.slotNumber}\nStatus: ${slot.status}\nZone: ${slot.zone.zoneName}`);
+                };
+
+                grid.appendChild(div);
+            });
+
+            zoneDiv.appendChild(grid);
+            container.appendChild(zoneDiv);
+        }
+    })
+    .catch(() => console.error("Error loading slots"));
+}
+
+// THE REST OF YOUR API LOGIC (KEEPING YOUR ORIGINAL FUNCTIONS)
+function showCard(label, value, subText = "") {
+    document.getElementById("result").innerHTML = `
+        <div class="stat-label">${label}</div>
+        <div class="stat-value">${value}</div>
+        <div class="stat-sub">${subText}</div>
+    `;
+}
+function showSlotResult(text) { document.getElementById("slotResult").innerText = text; }
+function showZone(text) { document.getElementById("zoneResult").innerText = text; }
+function openActiveBookingsPage() {
+    window.open("active-bookings.html", "_blank");
+}
+
+function addZone() {
+    let zoneName = document.getElementById("zoneName").value;
+    let vehicleType = document.getElementById("vehicleType").value;
+    fetch(`${BASE_URL}/zone/add?zoneName=${zoneName}&vehicleType=${vehicleType}`, { method: "POST" })
+    .then(res => res.json())
+    .then(data => showZone("✅ Zone Added: " + data.zoneName))
+    .catch(() => showZone("❌ Error adding zone"));
+}
+
+function getZones() {
+
+    fetch("https://parking-backend-production-e6a9.up.railway.app/zone/all")
+    .then(res => res.json())
+    .then(data => {
+
+        data.sort((a, b) => a.zoneName.localeCompare(b.zoneName));
+
+        let html = `
+            <table class="slot-table">
+                <tr>
+                    <th>ID</th>
+                    <th>Zone</th>
+                    <th>Vehicle Type</th>
+                    <th>Total Slots</th>
+                </tr>
+        `;
+
+        data.forEach(z => {
+            html += `
+                <tr>
+                    <td>${z.id}</td>
+                    <td>${z.zoneName}</td>
+                    <td>${z.vehicleType}</td>
+                    <td>${z.totalSlots}</td>
+                </tr>
+            `;
+        });
+
+        html += `</table>`;
+
+        document.getElementById("zoneResult").innerHTML = html;
+    })
+    .catch(() => {
+        document.getElementById("zoneResult").innerHTML =
+            `<p style="color:#ef4444;">❌ Error loading zones</p>`;
+    });
+}
+
+function addSlot() {
+    let slotNumber = document.getElementById("slotNumber").value;
+    let zoneId = document.getElementById("zoneId").value;
+    fetch(`${BASE_URL}/slot/add?slotNumber=${slotNumber}&zoneId=${zoneId}`, { method: "POST" })
+    .then(res => res.json())
+    .then(data => {
+        showSlotResult("✅ Slot Added: " + data.slotNumber);
+        loadSlots();
+    });
+}
+function loadActiveBookings() {
+
+    fetch("https://parking-backend-production-e6a9.up.railway.app/admin/active-parking")
+    .then(res => res.json())
+    .then(data => {
+
+        let html = `
+            <table class="slot-table">
+                <tr>
+                    <th>Booking ID</th>
+                    <th>User ID</th>
+                    <th>Name</th>
+                    <th>Slot</th>
+                    <th>Vehicle Type</th>
+                    <th>Status</th>
+                </tr>
+        `;
+
+        if (data.length === 0) {
+            html += `
+                <tr>
+                    <td colspan="6">No active bookings</td>
+                </tr>
+            `;
+        } else {
+            data.forEach(b => {
+                html += `
+                    <tr>
+                        <td>${b.bookingId || b.id}</td>
+                        <td>${b.user ? b.user.id : "-"}</td>
+                        <td>${b.user ? b.user.name : "-"}</td>
+                        <td>${b.slot ? b.slot.slotNumber : "-"}</td>
+                        <td>${b.vehicleType || "-"}</td>
+                        <td>${b.status || "-"}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        html += `</table>`;
+
+        document.getElementById("activeBookingResult").innerHTML = html;
+    })
+    .catch(() => {
+        document.getElementById("activeBookingResult").innerHTML =
+            `<p style="color:#ef4444;">❌ Error loading active bookings</p>`;
+    });
+}
+function deleteSlot() {
+
+    let slotId = document.getElementById("deleteSlotId").value;
+
+    fetch(`https://parking-backend-production-e6a9.up.railway.app/slot/delete/${slotId}`, {
+        method: "DELETE"
+    })
+    .then(res => res.text())
+    .then(data => {
+        document.getElementById("slotResult").innerText = "✅ " + data;
+        loadSlots();
+    })
+    .catch(() => {
+        document.getElementById("slotResult").innerText = "❌ Error deleting slot";
+    });
+}
+
+function getAllSlots() {
+
+    fetch("https://parking-backend-production-e6a9.up.railway.app/slot/all")
+    .then(res => res.json())
+    .then(data => {
+
+        let html = `
+            <table class="slot-table">
+                <tr>
+                    <th>Slot</th>
+                    <th>Status</th>
+                </tr>
+        `;
+        data.sort((a, b) => {
+
+    let zoneA = a.slotNumber.charAt(0);
+    let zoneB = b.slotNumber.charAt(0);
+
+    let numA = parseInt(a.slotNumber.substring(1));
+    let numB = parseInt(b.slotNumber.substring(1));
+
+    if (zoneA === zoneB) {
+        return numA - numB;
+    }
+
+    return zoneA.localeCompare(zoneB);
+});
+
+        data.forEach(s => {
+            let color = s.status === "AVAILABLE" ? "available" : "occupied";
+
+            html += `
+                <tr>
+                    <td>${s.slotNumber}</td>
+                    <td class="slot-badge ${color}">${s.status}</td>
+                </tr>
+            `;
+        });
+
+        html += `</table>`;
+
+        document.getElementById("slotResult").innerHTML = html;
+    })
+    .catch(() => {
+        document.getElementById("slotResult").innerText = "❌ Error loading slots";
+    });
+}
+function deleteSlotByNumber() {
+
+    let slotNumber = document.getElementById("deleteSlotNumber").value.trim();
+
+    fetch(`https://parking-backend-production-e6a9.up.railway.app/slot/deleteByNumber/${slotNumber}`, {
+        method: "DELETE"
+    })
+    .then(res => res.text().then(text => ({ ok: res.ok, text })))
+    .then(({ ok, text }) => {
+        if (!ok) {
+            throw new Error(text || "Delete failed");
+        }
+
+        document.getElementById("slotResult").innerText = "✅ " + text;
+        loadSlots();
+    })
+    .catch(err => {
+        document.getElementById("slotResult").innerText = "❌ " + err.message;
+        console.log(err);
+    });
+}
+function getTotalSlots() {
+    fetch(BASE_URL + "/admin/total-slots")
+    .then(res => res.text())
+    .then(data => showCard("Total Slots", data, "Overall parking capacity"));
+}
+function getAvailableSlots() {
+    fetch(BASE_URL + "/admin/available-slots")
+    .then(res => res.text())
+    .then(data => showCard("Available Slots", data, "Ready for allocation"));
+}
+function getOccupiedSlots() {
+    fetch(BASE_URL + "/admin/occupied-slots")
+    .then(res => res.text())
+    .then(data => showCard("Occupied Slots", data, "Currently in use"));
+}
+function getRevenue() {
+    fetch(BASE_URL + "/admin/today-revenue")
+    .then(res => res.text())
+    .then(data => showCard("Today's Revenue", "₹" + data, "Live earnings summary"));
+}
+
+function openAddUser() { window.open("add-user.html", "_blank"); }
+function openAddVehicle() { window.open("add-vehicle.html", "_blank"); }
+function openUsersPage() { window.open("view-users.html", "_blank"); }
+
+// Init
+loadSlots();
+setInterval(loadSlots, 5000);
+</script>
+</body>
+</html>

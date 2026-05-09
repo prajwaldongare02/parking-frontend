@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Active Bookings</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #0f172a;
+            color: white;
+            margin: 0;
+            padding: 30px;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #93c5fd;
+        }
+
+        .table-box {
+            background: rgba(15, 23, 42, 0.95);
+            border: 1px solid rgba(59,130,246,0.25);
+            border-radius: 12px;
+            padding: 16px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            color: white;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+
+        th {
+            background: rgba(37, 99, 235, 0.2);
+            color: #93c5fd;
+        }
+
+        tr:hover {
+            background: rgba(255,255,255,0.04);
+        }
+    </style>
+</head>
+<body>
+
+    <h2>🚗 Active Bookings</h2>
+
+    <div class="table-box">
+        <table id="bookingTable">
+            <tr>
+                <th>Booking ID</th>
+                <th>User ID</th>
+                <th>Name</th>
+                <th>Slot</th>
+                <th>Vehicle Type</th>
+                <th>Status</th>
+            </tr>
+        </table>
+    </div>
+
+    <script>
+        fetch("https://parking-backend-production-e6a9.up.railway.app/admin/active-booking-list")
+        .then(res => res.json())
+        .then(data => {
+            let table = document.getElementById("bookingTable");
+
+            if (data.length === 0) {
+                let row = table.insertRow();
+                let cell = row.insertCell(0);
+                cell.colSpan = 6;
+                cell.innerText = "No active bookings";
+                return;
+            }
+
+            data.forEach(b => {
+                let row = table.insertRow();
+
+                row.insertCell(0).innerText = b.bookingId || "-";
+                row.insertCell(1).innerText = b.user ? b.user.id : "-";
+                row.insertCell(2).innerText = b.user ? b.user.name : "-";
+                row.insertCell(3).innerText = b.slot ? b.slot.slotNumber : "-";
+                row.insertCell(4).innerText = b.vehicleType || "-";
+                row.insertCell(5).innerText = b.status || "-";
+            });
+        })
+        .catch(() => {
+            alert("Error loading active bookings");
+        });
+    </script>
+
+</body>
+</html>
