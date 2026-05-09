@@ -327,7 +327,7 @@
 </main>
 
 <script>
-let BASE_URL = "https://parking-backend-production-e6a9.up.railway.app";
+let BASE_URL = "https://parking-backend-production-29b5.up.railway.app";
 
 // 🕒 REAL-TIME CLOCK
 setInterval(() => {
@@ -412,7 +412,7 @@ function addZone() {
 
 function getZones() {
 
-    fetch("https://parking-backend-production-e6a9.up.railway.app/zone/all")
+    fetch("https://parking-backend-production-29b5.up.railway.app/zone/all")
     .then(res => res.json())
     .then(data => {
 
@@ -461,7 +461,7 @@ function addSlot() {
 }
 function loadActiveBookings() {
 
-    fetch("https://parking-backend-production-e6a9.up.railway.app/admin/active-parking")
+    fetch("https://parking-backend-production-29b5.up.railway.app/admin/active-parking")
     .then(res => res.json())
     .then(data => {
 
@@ -511,7 +511,7 @@ function deleteSlot() {
 
     let slotId = document.getElementById("deleteSlotId").value;
 
-    fetch(`https://parking-backend-production-e6a9.up.railway.app/slot/delete/${slotId}`, {
+    fetch(`https://parking-backend-production-29b5.up.railway.app/slot/delete/${slotId}`, {
         method: "DELETE"
     })
     .then(res => res.text())
@@ -526,7 +526,7 @@ function deleteSlot() {
 
 function getAllSlots() {
 
-    fetch("https://parking-backend-production-e6a9.up.railway.app/slot/all")
+    fetch("https://parking-backend-production-29b5.up.railway.app/slot/all")
     .then(res => res.json())
     .then(data => {
 
@@ -575,7 +575,7 @@ function deleteSlotByNumber() {
 
     let slotNumber = document.getElementById("deleteSlotNumber").value.trim();
 
-    fetch(`https://parking-backend-production-e6a9.up.railway.app/slot/deleteByNumber/${slotNumber}`, {
+    fetch(`https://parking-backend-production-29b5.up.railway.app/slot/deleteByNumber/${slotNumber}`, {
         method: "DELETE"
     })
     .then(res => res.text().then(text => ({ ok: res.ok, text })))
